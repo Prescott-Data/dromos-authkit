@@ -102,6 +102,13 @@ func AuthN(cfg Config) gin.HandlerFunc {
 			claims.Roles = roles
 		}
 
+		// Fallback: extract org ID from roles claim if not present as a top-level claim.
+		// Zitadel embeds the org ID as the key inside each role grant, e.g.:
+		//   "urn:zitadel:iam:org:project:roles": { "user": { "<orgID>": "domain" } }
+		if claims.OrgID == "" && claims.Roles != nil {
+			claims.OrgID = extractOrgIDFromRoles(claims.Roles)
+		}
+
 		SetClaims(c, claims)
 		c.Next()
 	}
@@ -211,5 +218,24 @@ func ValidateToken(tokenStr string, cfg Config) (*Claims, error) {
 		claims.Roles = roles
 	}
 
+	if claims.OrgID == "" && claims.Roles != nil {
+		claims.OrgID = extractOrgIDFromRoles(claims.Roles)
+	}
+
 	return claims, nil
+}
+
+// extractOrgIDFromRoles pulls the org ID from the Zitadel role grant structure.
+// Each role maps to { "<orgID>": "<domain>" }. Returns the first org ID found.
+func extractOrgIDFromRoles(roles map[string]interface{}) string {
+	for _, grants := range roles {
+		grantsMap, ok := grants.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		for orgID := range grantsMap {
+			return orgID
+		}
+	}
+	return ""
 }
