@@ -1,0 +1,88 @@
+# golangci-lint configuration
+# https://golangci-lint.run/usage/configuration/
+
+version: "1"
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck       # Check for unchecked errors
+    - gosimple       # Simplify code
+    - govet          # Vet examines Go source code
+    - ineffassign    # Detect ineffectual assignments
+    - staticcheck    # Advanced Go linter
+    - unused         # Check for unused code
+    - gofmt          # Check formatting
+    - goimports      # Check imports
+    - misspell       # Check for misspelled words
+    - gocritic       # Opinionated Go linter
+    - revive         # Fast, configurable linter
+    - gosec          # Security-focused linter
+    - unconvert      # Remove unnecessary type conversions
+    - unparam        # Check for unused function parameters
+    - gocyclo        # Cyclomatic complexity
+    - dupl           # Code clone detection
+    - prealloc       # Preallocate slices
+    - nilerr         # Check nil error returns
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+
+  govet:
+    check-shadowing: true
+
+  gocyclo:
+    min-complexity: 15
+
+  dupl:
+    threshold: 100
+
+  misspell:
+    locale: US
+
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - commentedOutCode
+
+  revive:
+    rules:
+      - name: exported
+        disabled: false
+
+  gosec:
+    excludes:
+      - G404  # Use of weak random number generator (we're not using for crypto)
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+        - gocritic
+
+    # Ignore long lines for go:generate
+    - linters:
+        - lll
+      source: "^//go:generate "
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true

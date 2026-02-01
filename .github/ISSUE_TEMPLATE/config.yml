@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or Discussion
+    url: https://github.com/Prescott-Data/dromos-authkit/discussions
+    about: Ask questions or discuss ideas with the community
+  - name: Documentation
+    url: https://pkg.go.dev/github.com/Prescott-Data/dromos-authkit
+    about: Read the package documentation
