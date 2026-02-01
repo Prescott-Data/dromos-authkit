@@ -8,6 +8,11 @@ run:
   tests: true
   modules-download-mode: readonly
 
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
 linters:
   enable:
     - errcheck
@@ -16,8 +21,6 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-    - gofmt
-    - goimports
     - misspell
     - gocritic
     - revive
