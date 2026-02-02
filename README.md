@@ -2,7 +2,7 @@
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
-A lightweight, production-ready authentication and authorization middleware for [Gin](https://github.com/gin-gonic/gin)-based Dromos Suite APIs, using [Zitadel](https://zitadel.com/) OIDC tokens.
+A lightweight authentication and authorization middleware for [Gin](https://github.com/gin-gonic/gin)-based Dromos Suite APIs, using [Zitadel](https://zitadel.com/) OIDC tokens.
 
 
 ## Installation
@@ -284,48 +284,3 @@ func TestProtectedRoute(t *testing.T) {
     }
 }
 ```
-
-## Performance Considerations
-
-- **JWKS Caching**: Public keys are cached and refreshed automatically
-- **Context Storage**: Claims are stored once per request in Gin context
-- **Minimal Allocations**: Optimized for high-throughput scenarios
-
-## Security Best Practices
-
-1. **Always use HTTPS** in production
-2. **Validate audience claims** to prevent token reuse across projects
-3. **Keep skip paths minimal** - only exempt truly public endpoints
-4. **Log authentication failures** for security monitoring
-5. **Rotate Zitadel keys regularly**
-
-## Zitadel Configuration
-
-1. Create a new project in Zitadel
-2. Note your Project ID (use as `Audience`)
-3. Create roles within the project
-4. Assign roles to users/organizations
-5. Generate an API application for your service
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This software is proprietary and confidential. Copyright © 2026 Prescott Data. All rights reserved.
-
-Unauthorized copying, distribution, modification, or use of this software is strictly prohibited. See the [LICENSE](LICENSE) file for complete terms.
-
-## Support
-
-- [Issue Tracker](https://github.com/Prescott-Data/dromos-authkit/issues)
-- [Discussions](https://github.com/Prescott-Data/dromos-authkit/discussions)
-
-## Acknowledgments
-
-Built with:
-
-- [Gin Web Framework](https://github.com/gin-gonic/gin)
-- [golang-jwt](https://github.com/golang-jwt/jwt)
-- [Zitadel](https://zitadel.com/)
