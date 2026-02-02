@@ -92,9 +92,10 @@ func AuthN(cfg Config) gin.HandlerFunc {
 		}
 
 		claims := &Claims{
-			Sub:   getStringClaim(mapClaims, "sub"),
-			Email: getStringClaim(mapClaims, "email"),
-			OrgID: getStringClaim(mapClaims, "urn:zitadel:iam:org:id"),
+			Sub:       getStringClaim(mapClaims, "sub"),
+			Email:     getStringClaim(mapClaims, "email"),
+			OrgID:     getStringClaim(mapClaims, "urn:zitadel:iam:org:id"),
+			OrgDomain: getStringClaim(mapClaims, "urn:zitadel:iam:user:resourceowner:primary_domain"),
 		}
 
 		// Extract project roles
@@ -210,9 +211,10 @@ func ValidateToken(tokenStr string, cfg Config) (*Claims, error) {
 	}
 
 	claims := &Claims{
-		Sub:   getStringClaim(mapClaims, "sub"),
-		Email: getStringClaim(mapClaims, "email"),
-		OrgID: getStringClaim(mapClaims, "urn:zitadel:iam:org:id"),
+		Sub:       getStringClaim(mapClaims, "sub"),
+		Email:     getStringClaim(mapClaims, "email"),
+		OrgID:     getStringClaim(mapClaims, "urn:zitadel:iam:org:id"),
+		OrgDomain: getStringClaim(mapClaims, "urn:zitadel:iam:user:resourceowner:primary_domain"),
 	}
 	if roles, ok := mapClaims["urn:zitadel:iam:org:project:roles"].(map[string]interface{}); ok {
 		claims.Roles = roles
