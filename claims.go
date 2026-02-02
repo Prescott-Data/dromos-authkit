@@ -17,6 +17,9 @@ type Claims struct {
 	// OrgID is the Zitadel organization ID the user belongs to.
 	OrgID string `json:"urn:zitadel:iam:org:id"`
 
+	// OrgDomain is the primary domain of the user's resource owner organization.
+	OrgDomain string `json:"urn:zitadel:iam:user:resourceowner:primary_domain"`
+
 	// Roles maps role names to their grant details.
 	// The keys are role names (e.g. "admin", "editor").
 	Roles map[string]interface{} `json:"urn:zitadel:iam:org:project:roles"`
@@ -55,6 +58,15 @@ func UserID(c *gin.Context) string {
 func OrgID(c *gin.Context) string {
 	if cl := GetClaims(c); cl != nil {
 		return cl.OrgID
+	}
+	return ""
+}
+
+// OrgDomain returns the authenticated user's organization primary domain.
+// Returns empty string if no org domain is available.
+func OrgDomain(c *gin.Context) string {
+	if cl := GetClaims(c); cl != nil {
+		return cl.OrgDomain
 	}
 	return ""
 }
