@@ -1,29 +1,14 @@
 package authkit
 
 import (
+	"github.com/Prescott-Data/dromos-authkit/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
 const claimsKey = "dromos_auth_claims"
 
-// Claims represents the validated JWT claims from Zitadel.
-type Claims struct {
-	// Sub is the Zitadel user ID.
-	Sub string `json:"sub"`
-
-	// Email is the user's email address.
-	Email string `json:"email"`
-
-	// OrgID is the Zitadel organization ID the user belongs to.
-	OrgID string `json:"urn:zitadel:iam:org:id"`
-
-	// OrgDomain is the primary domain of the user's resource owner organization.
-	OrgDomain string `json:"urn:zitadel:iam:user:resourceowner:primary_domain"`
-
-	// Roles maps role names to their grant details.
-	// The keys are role names (e.g. "admin", "editor").
-	Roles map[string]interface{} `json:"urn:zitadel:iam:org:project:roles"`
-}
+// Claims is an alias to models.Claims for backward compatibility.
+type Claims = models.Claims
 
 // SetClaims stores validated claims in the Gin context.
 func SetClaims(c *gin.Context, claims *Claims) {
