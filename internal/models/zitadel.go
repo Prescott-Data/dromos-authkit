@@ -218,3 +218,29 @@ type ZitadelSearchUsersResponseBody struct {
 		TotalResult string `json:"totalResult"`
 	} `json:"details"`
 }
+
+// IDPLink represents a user's linked external identity provider
+type IDPLink struct {
+	IDPID          string `json:"idp_id"`
+	IDPName        string `json:"idp_name"`
+	UserID         string `json:"user_id"`
+	ExternalUserID string `json:"external_user_id"`
+	DisplayName    string `json:"display_name"`
+	ProvidedUserID string `json:"provided_user_id,omitempty"`
+	ProvidedEmail  string `json:"provided_email,omitempty"`
+}
+
+// ZitadelListIDPLinksResponseBody is the response format for listing user IDP links
+type ZitadelListIDPLinksResponseBody struct {
+	Result []struct {
+		IDPID          string `json:"idpId"`
+		UserID         string `json:"userId"`
+		IDPName        string `json:"idpName"`
+		ProvidedUserID string `json:"providedUserId"`
+		ProvidedEmail  string `json:"providedUserName"` // Zitadel uses providedUserName for email
+		IDPType        int    `json:"idpType"`
+	} `json:"result"`
+	Details struct {
+		TotalResult string `json:"totalResult"`
+	} `json:"details"`
+}
