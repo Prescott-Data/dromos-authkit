@@ -33,6 +33,9 @@ type UserResponse = models.UserResponse
 // OrganizationResponse is an alias to models.OrganizationResponse for backward compatibility.
 type OrganizationResponse = models.OrganizationResponse
 
+// IDPLink is an alias to models.IDPLink for backward compatibility.
+type IDPLink = models.IDPLink
+
 // NewZitadelClient creates a new Zitadel API client with the provided configuration.
 func NewZitadelClient(cfg ZitadelConfig) *ZitadelClient {
 	timeout := cfg.Timeout
@@ -736,4 +739,83 @@ func (z *ZitadelClient) GetUserGrantForProject(ctx context.Context, userID strin
 		Email:     g.Email,
 		AvatarURL: g.AvatarURL,
 	}, nil
+}
+
+// GetUserIDPLinks retrieves all external identity provider links for a user.
+func (z *ZitadelClient) GetUserIDPLinks(ctx context.Context, userID string) ([]IDPLink, error) {
+	url := fmt.Sprintf("%s/management/v1/users/%s/idps/_search", z.ZitadelClient.BaseURL, userID)
+
+	// Empty search body to get all links
+	reqBody := map[string]any{}
+	body, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", "Bearer "+z.ZitadelClient.ServiceToken)
+
+	resp, err := z.ZitadelClient.HTTPClient.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
+	}
+
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(respBody))
+	}
+
+	var apiResp models.ZitadelListIDPLinksResponseBody
+	if err := json.Unmarshal(respBody, &apiResp); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	links := make([]IDPLink, 0, len(apiResp.Result))
+	for _, link := range apiResp.Result {
+		links = append(links, IDPLink{
+			IDPID:          link.IDPID,
+			IDPName:        link.IDPName,
+			UserID:         link.UserID,
+			ExternalUserID: link.ProvidedUserID,
+			ProvidedUserID: link.ProvidedUserID,
+			ProvidedEmail:  link.ProvidedEmail,
+		})
+	}
+
+	return links, nil
+}
+
+// RemoveUserIDPLink removes an external identity provider link from a user.
+func (z *ZitadelClient) RemoveUserIDPLink(ctx context.Context, userID, idpID, externalUserID string) error {
+	url := fmt.Sprintf("%s/management/v1/users/%s/idps/%s/%s", z.ZitadelClient.BaseURL, userID, idpID, externalUserID)
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodDelete, url, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	httpReq.Header.Set("Authorization", "Bearer "+z.ZitadelClient.ServiceToken)
+
+	resp, err := z.ZitadelClient.HTTPClient.Do(httpReq)
+	if err != nil {
+		return fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		respBody, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(respBody))
+	}
+
+	return nil
 }
